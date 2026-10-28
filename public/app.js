@@ -23,7 +23,12 @@ async function loadSlots() {
   const res = await fetch(`/api/slots?store=${state.store}&day=${state.day}`);
   const { slots } = await res.json();
   // Render off the critical path so the date picker stays snappy on low-end phones.
-  requestIdleCallback(() => renderSlots(slots), { timeout: 500 });
+  const render = () => renderSlots(slots);
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(render, { timeout: 500 });
+  } else {
+    setTimeout(render, 0);
+  }
   updateButton();
 }
 
